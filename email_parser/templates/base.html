@@ -1,0 +1,330 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} Email Analyzer {% endblock title %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% block css %}
+    <link rel="stylesheet" href="{% static 'email_analyzer/css/styles.css' %}">
+    {% endblock css %}
+</head>
+
+<body>
+    <!-- Navbar -->
+    {% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'base' %}">Email Analyzer</a>
+            <img id="robot-img" src="{% static 'email_analyzer/images/email2.gif' %}" alt="Robot" class="robot-image" />
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">.eml Parser</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dns_check' %}">DNS Check</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'spoof_check' %}">Spoof Check</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact-us' %}">Support</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endblock navbar %}
+
+    <!-- Main Content -->
+    {% block main-body %}
+    <div class="container main-content">
+        <h1>Welcome to Email Analyzer</h1>
+        <p class="lead">Analyze your emails for threats and vulnerabilities.</p>
+        <div class="slogan">"Hits by incident, contact us now."</div>
+        <a href="{% url 'contact-us' %}" class="btn btn-primary btn-lg contact-btn">Contact Us</a>
+    </div>
+    {% endblock main-body %}
+
+    <!-- Animated Robot Button -->
+    <div id="robot-btn" class="robot-btn">
+        <img id="robot-img" src="{% static 'email_analyzer/images/robot-lunch.gif' %}" alt="Robot" class="robot-image" />
+        <div id="id-speech" class="robot-speech">How can I help you?</div>
+    </div>
+
+    <!-- Chatbot Widget -->
+    <div class="chatbot-widget" id="chatbot-widget">
+        <div class="chatbot-header">
+            <h4>Ask Me Anything!</h4>
+            <button id="chat-close" class="chat-close">&times;</button>
+        </div>
+        <div class="chatbot-body" id="chatbot-body">
+            <div class="message bot-message">Hi! I'm here to help you with email analysis.</div>
+        </div>
+        <div class="chatbot-footer">
+            <input type="text" id="chatbot-input" placeholder="Type your message..." />
+            <button onclick="sendMessage()" id="chatbot-send" class="chatbot-send-btn">Send</button>
+        </div>
+    </div>
+
+    <!-- Styles -->
+    <style>
+        /* Chatbot Button */
+        .robot-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .robot-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .robot-image {
+            width: 100px;
+            margin-right: 80px;
+           
+        }
+        .robot-btn.hidden {
+            display: none; /* Hide the robot button when the widget is open */
+        }
+        .robot-speech {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 10px 10px;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Chatbot Widget */
+        .chatbot-widget {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 350px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 1500;
+        }
+
+        .chatbot-widget.open {
+            display: flex;
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .chatbot-header {
+            background-color: #0d6efd;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .chat-close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .chatbot-body {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: messageAppear 0.4s forwards;
+        }
+
+        .bot-message {
+            background-color: #d1e7dd;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-message {
+            background-color: #ffeeba;
+            text-align: right;
+            margin-left: auto;
+        }
+
+        .chatbot-footer {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+
+        #chatbot-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        #chatbot-input:focus {
+            border-color: #0d6efd;
+        }
+
+        .chatbot-send-btn {
+            background-color: #0d6efd;
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .chatbot-send-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes messageAppear {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const robotBtn = document.getElementById("robot-btn");
+            
+            const chatbotWidget = document.getElementById("chatbot-widget");
+            const chatbotClose = document.getElementById("chat-close");
+            const chatbotInput = document.getElementById("chatbot-input");
+            const chatbotSend = document.getElementById("chatbot-send");
+            const chatbotBody = document.getElementById("chatbot-body");
+
+            // Open chat widget with animation
+            robotBtn.addEventListener("click", function () {
+                if (!chatbotWidget.classList.contains("open")) {
+                    chatbotWidget.classList.add("open"); // Add class to show the widget
+                    robotBtn.classList.add("hidden");
+                 
+                }
+            });
+
+            // Close chat widget with animation
+            chatbotClose.addEventListener("click", function () {
+                if (chatbotWidget.classList.contains("open")) {
+                    chatbotWidget.classList.remove("open"); // Remove class to hide the widget
+                    robotBtn.classList.remove("hidden");
+                }
+            });
+
+            // Function to send a message
+            function sendMessage() {
+                const userMessage = chatbotInput.value.trim();
+                if (userMessage) {
+                    displayUserMessage(userMessage);
+                    chatbotInput.value = ""; // Clear input
+                    fetchBotResponse(userMessage); // Get response from Django API
+                }
+            }
+
+            // Display user message with animation
+            function displayUserMessage(message) {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message", "user-message");
+                messageDiv.textContent = message;
+                chatbotBody.appendChild(messageDiv);
+                chatbotBody.scrollTop = chatbotBody.scrollHeight;
+            }
+
+            // Display bot response with animation
+            function displayBotMessage(message) {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message", "bot-message");
+                messageDiv.textContent = message;
+                chatbotBody.appendChild(messageDiv);
+                chatbotBody.scrollTop = chatbotBody.scrollHeight;
+            }
+
+            // Fetch AI response from Django backend
+            function fetchBotResponse(userMessage) {
+                fetch("/chat/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ message: userMessage })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.response) {
+                        displayBotMessage(data.response);
+                    } else {
+                        displayBotMessage("I'm sorry, I couldn't get a response from the AI.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    displayBotMessage("I'm sorry, something went wrong.");
+                });
+            }
+
+            // Send message on button click
+            chatbotSend.addEventListener("click", sendMessage);
+
+            // Send message on Enter key press
+            chatbotInput.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

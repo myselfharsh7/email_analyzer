@@ -1,0 +1,46 @@
+/* Styling for flagged vendors section */
+.flagged-vendors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Spacing between badges */
+    margin-top: 10px;
+}
+
+.vendor-badge {
+    background-color: #f46056; /* Red for danger */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px; /* Rounded corners */
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.vendor-badge:hover {
+    transform: scale(1.05);
+    background-color: #d32f2f;
+}
+
+.no-vendor-badge {
+    background-color: rgb(85, 238, 85); /* Red for danger */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px; /* Rounded corners */
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.no-vendor-badge:hover {
+    transform: scale(1.05);
+    background-color: rgb(9, 144, 9);
+}
+
+.spinner-border {
+    display: block;
+    margin: 20px right;
+}
