@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-e+aru(iv6%4%h1@iiv4_9ai)$-ksd39lxq(16mx33lq9il9u6q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['email-analyzer.onrender.com']
+ALLOWED_HOSTS = ['email-analyzer-1.onrender.com']
 
 
 # Application definition
